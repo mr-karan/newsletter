@@ -1,15 +1,15 @@
-const BASE_URL = 'https://jsonplaceholder.typicode.com';
+const BASE_URL = '/api';
 
 export const addSubscription = async sub => {
     try {
-        const res = await axios.post(`${BASE_URL}/subs`, sub);
+        const res = await axios.post(`${BASE_URL}/create`, sub);
         const newSub = res.data;
 
         console.log(`Added a new Subscription!`, newSub);
 
         return newSub;
     } catch (e) {
-        console.error(`Error creating new subscription`, e);
+        console.error(`Error creating new subscription ${e}`);
     }
 };
 

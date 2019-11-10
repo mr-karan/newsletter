@@ -52,20 +52,28 @@ func initLogger() {
 	errLog = log.New(os.Stderr, "ERR: ", log.Ldate|log.Ltime|log.Llongfile)
 }
 
-func initFS() {
+// initFileSystem initializes the stuffbin FileSystem to provide
+// access to bunded static assets to the app.
+func initFileSystem(binPath string) (stuffbin.FileSystem, error) {
 	fs, err := stuffbin.UnStuff(os.Args[0])
 	if err != nil {
-		errLog.Fatalf("error reading stuffed binary: %v", err)
+		return nil, err
 	}
 	fmt.Println("loaded files", fs.List())
+	return fs, nil
 }
 
 func main() {
 	initLogger()
-	initFS()
+	// Initialize the static file system into which all
+	// required static assets (.css, .js files etc.) are loaded.
+	fs, err := initFileSystem(os.Args[0])
+	if err != nil {
+		errLog.Fatalf("error reading stuffed binary: %v", err)
+	}
 	sysLog.Printf("Booting program...")
 	// Root Endpoint
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		sendEnvelope(w, http.StatusOK, fmt.Sprintf("Welcome to newsletter subscription API"), nil)
 		return
 	})
@@ -102,6 +110,20 @@ func main() {
 		}
 		// decode request payload in a struct
 		sendEnvelope(w, http.StatusOK, "wip", nil)
+		return
+	})
+	// Static handler
+	http.Handle("/static/", fs.FileServer())
+	// Load index page
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		index, err := fs.Read("/static/index.html")
+		if err != nil {
+			sendEnvelope(w, http.StatusInternalServerError, fmt.Sprintf("error loading index from stuffed binary"), nil)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(string(index)))
 		return
 	})
 	// Start a web server

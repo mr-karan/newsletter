@@ -7,7 +7,7 @@ COMMIT_DATE := $(shell git show -s --format=%ci ${HASH})
 BUILD_DATE := $(shell date '+%Y-%m-%d %H:%M:%S')
 VERSION := ${HASH} (${COMMIT_DATE})
 
-STATIC := ../frontend/index.html:/frontend ../frontend/static:/static
+STATIC := ../frontend/static:/static
 
 deps:
 	go get -u github.com/knadh/stuffbin/...
