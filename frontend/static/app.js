@@ -23,13 +23,14 @@ const formEvent = form.addEventListener('submit', async event => {
     const email = document.querySelector('#email_addr').value;
     btn.disabled = true;
     btn.innerText = "Sending...";
-    btn.style.color = "#dddddd";
     const sub = {
         email
     };
 
     const newSub = await addSubscription(sub);
     const alert = document.querySelector('#alert');
-    form.classList.add("hide");
+    form.reset();
+    btn.innerText = "Subscribe";
+    btn.disabled = false;
     alert.classList.remove("invisible");
 });
