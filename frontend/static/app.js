@@ -18,12 +18,18 @@ const form = document.querySelector('form');
 const formEvent = form.addEventListener('submit', async event => {
     event.preventDefault();
 
-    const email = document.querySelector('#email_addr').value;
+    const btn = document.querySelector('#subscribe-btn');
 
+    const email = document.querySelector('#email_addr').value;
+    btn.disabled = true;
+    btn.innerText = "Sending...";
+    btn.style.color = "#dddddd";
     const sub = {
         email
     };
 
     const newSub = await addSubscription(sub);
-    // addNotificationToDOM(newSub);
+    const alert = document.querySelector('#alert');
+    form.classList.add("hide");
+    alert.classList.remove("invisible");
 });

@@ -7,3 +7,11 @@
 body {
     font-family: 'Inter', sans-serif;
 }
+
+.show {
+    display: block;
+}
+
+.hide {
+    display: none;
+}

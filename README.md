@@ -19,4 +19,9 @@ $ yarn watch # looks for changes in `css` directory and uses `tailwind` css to b
 
 ### Backend
 
-TODO
+```sh
+$ cd backend
+$ make deps
+$ make dist
+$ make run # starts a webserver with static assets packed into binary. API is available at `/api` and static assets at `/static`.
+```

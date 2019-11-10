@@ -11407,6 +11407,14 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
+}
+
 @media (min-width: 640px){
   .sm\:sr-only{
     position: absolute;
