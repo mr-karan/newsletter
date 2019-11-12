@@ -14,7 +14,8 @@ Subscribe to my newsletter at [news.mrkaran.dev](news.mrkaran.dev)
 $ cd frontend
 $ yarn # to add the required dependencies
 $ yarn run start:dev # starts a local dev server
-$ yarn watch # looks for changes in `css` directory and uses `tailwind` css to build the final minified css.
+$ yarn watch # looks for changes in `css` directory and uses `tailwind` css to build non-minified css for development.
+$ yarn build:prod # uses with `PostCSS` plugins like `css-nano` and `purge-css` which remove unwanted CSS + minify.
 ```
 
 ### Backend
