@@ -22,7 +22,7 @@ build-frontend:
 run:
 	./${BIN}
 
-fresh: clean build run
+fresh: clean dist run
 
 test:
 	go test
