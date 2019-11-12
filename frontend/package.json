@@ -9,8 +9,9 @@
     "watch": "^1.0.2"
   },
   "scripts": {
-    "build": "postcss css/*.css -o static/output.css && cp index.html static/index.html",
-    "watch": "watch 'yarn build' ./css",
+    "build:prod": "postcss css/*.css -o static/output.css && cp index.html static/index.html",
+    "build:dev": "tailwind build css/*.css -o static/output.css && cp index.html static/index.html",
+    "watch": "watch 'yarn build:dev' ./css",
     "start:dev": "live-server . --port=3000"
   },
   "devDependencies": {
