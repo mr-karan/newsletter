@@ -17,7 +17,7 @@ build:
 	go build -o ${BIN} -ldflags="-X 'main.version=${VERSION}' -X 'main.date=${BUILD_DATE}'"
 
 build-frontend:
-	cd ../frontend && yarn build
+	cd ../frontend && yarn build:prod
 
 run:
 	./${BIN}

@@ -51,3 +51,10 @@ const formEvent = form.addEventListener('submit', async event => {
     btn.innerText = "Subscribe";
     btn.disabled = false;
 });
+
+const closeAlert = document.querySelector(".close-alert");
+
+const closeAlertEvent = closeAlert.addEventListener('click', async event => {
+    event.preventDefault();
+    document.querySelector("#alert-error").classList.add("hide");
+})

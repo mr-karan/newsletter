@@ -2,7 +2,7 @@
 <html lang="en-US">
 
 <head>
-    <title>Newsletter by mrkaran</title>
+    <title>Newsletter from Karan</title>
     <base href="/" />
     <meta name="robots" content="all,noarchive" />
     <meta name="google" content="nositelinkssearchbox" />
@@ -39,62 +39,69 @@
     </div>
 </noscript>
 
-<body class="flex flex-col min-h-screen">
-    <header class="absolute top-0 right-0 mr-8">
-        <div class="mt-8 bg-blue-100 border-t-4 border-blue-500 rounded-b text-blue-900 px-4 py-3 shadow-md hide"
-            role="alert" id="alert-success">
-            <div class="flex">
-                <div class="py-1"><svg class="fill-current h-6 w-6 text-blue-500 mr-4"
-                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path
-                            d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z" />
-                    </svg></div>
-                <div>
-                    <p class="font-bold">Thanks for subscribing!</p>
-                    <p class="text-sm">Please check your inbox and confirm your email address.</p>
-                </div>
-            </div>
-        </div>
-        <div class="mt-8 bg-red-100 border-t-4 border-red-500 rounded-b text-red-900 px-4 py-3 shadow-md hide"
-            role="alert" id="alert-error">
-            <div class="flex">
-                <div class="py-1">
-                    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20">
-                        <title>Close</title>
-                        <path
-                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
-                    </svg>
-                </div>
-                <div>
-                    <p class="font-bold">Oops something unexepected happened!</p>
-                    <p class="text-sm">Please try submitting the form after sometime.</p>
-                </div>
-            </div>
+<body class="flex flex-col min-h-screen p-10">
+    <header class="mt-10">
+        <h1 class="text-4xl text-center">The DevOops Newsletter</h1>
+        <div class="absolute top-0 right-0 mr-8">
         </div>
     </header>
     <main class="main flex flex-col flex-grow items-center justify-center">
-        <div class="md:flex md:items-center md:flex-row sm:flex-col p-8">
-            <div class="md:w-1/2 md:mr-16">
-                <img src="images/newsletter.svg" class="logo" alt="Newsletter illustration">
+        <div class="md:flex md:items-center md:flex-row sm:flex-col m-10">
+            <div class="md:w-1/2 flex flex-col items-center">
+                <img src="static/images/newsletter.svg" class="logo" alt="Newsletter illustration">
             </div>
-            <div class="md:w-1/2 md:ml-16 flex flex-col items-center">
-                <h1 class="text-4xl text-center">Newsletter from Karan</h1>
-                <p class="mt-2 text-center whitespace-pre-line"> Subscribe to this bi-weekly newsletter to follow my
-                    journey as I explore Devops, Open Source and
-                    sometimes life in general.</p>
+            <div class="md:w-1/2 flex flex-col items-center md:max-w-3xl">
+                <h2 class="text-3xl">Subscribe</h2>
+                <p class="mt-3">
+                    A <span class="italic">bi-weekly</span> digest of all
+                    things Devops, FOSS and sometimes life in
+                    general. This newsletter is beyond just a link aggregator. You should subscribe to this
+                    if you want to read my learnings from experimenting with Containers, Self hosting and
+                    developing software.
+                </p>
                 <form class="w-full max-w-sm mt-8">
                     <div class="flex flex-col items-center">
                         <input
-                            class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
-                            id="inline-full-name" type="email" placeholder="Enter your email address">
+                            class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-green-500"
+                            id="email_addr" type="email" placeholder="Enter your email address" required="required">
                         <button
-                            class="mt-6 shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white py-2 px-4 rounded"
-                            type="button">
-                            Sign Up
+                            class="mt-6 shadow bg-green-500 hover:bg-green-400 focus:shadow-outline focus:outline-none text-white py-2 px-4 rounded"
+                            type="submit" id="subscribe-btn">
+                            Sign up
                         </button>
                     </div>
                 </form>
+                <div class="mt-8 bg-green-100 border-t-4 border-green-500 rounded-b text-green-900 px-4 py-3 shadow-md hide"
+                    role="alert" id="alert-success">
+                    <div class="flex">
+                        <div class="py-1"><svg class="fill-current h-6 w-6 text-green-500 mr-4"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path
+                                    d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z" />
+                            </svg></div>
+                        <div>
+                            <p class="font-bold">Thanks for subscribing!</p>
+                            <p class="text-sm">Please check your inbox and confirm your email address.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 bg-red-100 border-t-4 border-red-500 rounded-b text-red-900 px-4 py-3 shadow-md hide"
+                    role="alert" id="alert-error">
+                    <div class="flex">
+                        <div class="py-1">
+                            <svg class="fill-current h-6 w-6 text-red-500 close-alert" role="button"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <title>Close</title>
+                                <path
+                                    d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-bold">Oops something unexepected happened!</p>
+                            <p class="text-sm">Please try submitting the form after sometime.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
