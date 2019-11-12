@@ -99,7 +99,7 @@ func main() {
 			sendEnvelope(w, http.StatusBadRequest, fmt.Sprintf("EMail ID: %s is not valid", sub.EmailID), nil)
 			return
 		}
-		sendEnvelope(w, http.StatusOK, fmt.Sprintf(sub.EmailID), nil)
+		sendEnvelope(w, http.StatusInternalServerError, fmt.Sprintf(sub.EmailID), nil)
 		return
 	})
 	// Confirm email endpoint.

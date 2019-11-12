@@ -1,15 +1,18 @@
 const BASE_URL = '/api';
 
-export const addSubscription = async sub => {
+const addNotification = (id) => {
+    const alert = document.querySelector(id);
+    alert.classList.remove("hide");
+}
+
+const addSubscription = async sub => {
     try {
         const res = await axios.post(`${BASE_URL}/create`, sub);
         const newSub = res.data;
-
-        console.log(`Added a new Subscription!`, newSub);
-
         return newSub;
     } catch (e) {
         console.error(`Error creating new subscription ${e}`);
+        return null;
     }
 };
 
@@ -28,9 +31,14 @@ const formEvent = form.addEventListener('submit', async event => {
     };
 
     const newSub = await addSubscription(sub);
-    const alert = document.querySelector('#alert');
+    // if success
+    if (newSub) {
+        addNotification("#alert-success");
+    } else {
+        addNotification("#alert-error");
+    }
+    // reset state
     form.reset();
     btn.innerText = "Subscribe";
     btn.disabled = false;
-    alert.classList.remove("invisible");
 });
