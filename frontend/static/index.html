@@ -39,25 +39,8 @@
     </div>
 </noscript>
 
-<body class="flex flex-col min-h-screen">
-    <main class="main flex flex-col flex-grow items-center justify-center mt-24 p-10">
-        <h1 class="text-3xl">Newsletter from Karan</h1>
-        <p class="mt-6 whitespace-pre-line text-center">
-            Subscribe to this bi-weekly newsletter to follow my journey as I explore Devops,
-            Open Source and sometimes life in general.
-        </p>
-        <form class="w-full max-w-sm mt-24">
-            <div class="flex items-center border-b border-b-2 border-blue-500 py-2">
-                <input
-                    class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
-                    type="email" placeholder="Enter your email address" aria-label="Email address" id="email_addr">
-                <button
-                    class="flex-shrink-0 bg-blue-500 hover:bg-blue-700 border-blue-500 hover:border-blue-700 text-sm border-4 text-white py-1 px-2 rounded"
-                    type="submit" id="subscribe-btn">
-                    Subscribe
-                </button>
-            </div>
-        </form>
+<body>
+    <header class="absolute top-0 right-0 mr-8">
         <div class="mt-24 bg-blue-100 border-t-4 border-blue-500 rounded-b text-blue-900 px-4 py-3 shadow-md hide"
             role="alert" id="alert-success">
             <div class="flex">
@@ -75,23 +58,47 @@
         <div class="mt-24 bg-red-100 border-t-4 border-red-500 rounded-b text-red-900 px-4 py-3 shadow-md hide"
             role="alert" id="alert-error">
             <div class="flex">
-                <div class="py-1"><svg class="fill-current h-6 w-6 text-red-500 mr-4" xmlns="http://www.w3.org/2000/svg"
+                <div class="py-1">
+                    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20">
+                        <title>Close</title>
                         <path
-                            d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z" />
-                    </svg></div>
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
+                </div>
                 <div>
                     <p class="font-bold">Oops something unexepected happened!</p>
                     <p class="text-sm">Please try submitting the form after sometime.</p>
                 </div>
             </div>
         </div>
-    </main>
-    <footer class="p-10">
-        <div class="container mx-auto flex flex-col items-center justify-center">
-            <p>Delivered with <span style="color: #e25555;">&#9829;</span></p>
-        </div>
-    </footer>
+    </header>
+    <div class="flex flex-col min-h-screen">
+        <main class="main flex flex-col flex-grow items-center justify-center mt-24 p-10">
+            <h1 class="text-3xl">Newsletter from Karan</h1>
+            <p class="mt-6 whitespace-pre-line text-center">
+                Subscribe to this bi-weekly newsletter to follow my journey as I explore Devops,
+                Open Source and sometimes life in general.
+            </p>
+            <form class="w-full max-w-sm mt-24">
+                <div class="flex items-center border-b border-b-2 border-blue-500 py-2">
+                    <input
+                        class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
+                        type="email" placeholder="Enter your email address" aria-label="Email address" id="email_addr">
+                    <button
+                        class="flex-shrink-0 bg-blue-500 hover:bg-blue-700 border-blue-500 hover:border-blue-700 text-sm border-4 text-white py-1 px-2 rounded"
+                        type="submit" id="subscribe-btn">
+                        Subscribe
+                    </button>
+                </div>
+            </form>
+        </main>
+        <footer class="p-10">
+            <div class="container mx-auto flex flex-col items-center justify-center">
+                <p>Delivered with <span style="color: #e25555;">&#9829;</span></p>
+            </div>
+        </footer>
+    </div>
 </body>
 
 </html>

@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/knadh/stuffbin"
 )
 
@@ -16,8 +16,6 @@ var (
 	sysLog  *log.Logger
 	errLog  *log.Logger
 )
-
-var regexEmail = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
 // Response represents the standardized API response struct.
 type Response struct {
@@ -95,11 +93,11 @@ func main() {
 			sendEnvelope(w, http.StatusInternalServerError, fmt.Sprintf("Unable to parse the request"), nil)
 			return
 		}
-		if len(sub.EmailID) > 254 || !regexEmail.MatchString(sub.EmailID) {
+		if len(sub.EmailID) > 254 || !govalidator.IsEmail(sub.EmailID) {
 			sendEnvelope(w, http.StatusBadRequest, fmt.Sprintf("EMail ID: %s is not valid", sub.EmailID), nil)
 			return
 		}
-		sendEnvelope(w, http.StatusInternalServerError, fmt.Sprintf(sub.EmailID), nil)
+		sendEnvelope(w, http.StatusOK, fmt.Sprintf(sub.EmailID), nil)
 		return
 	})
 	// Confirm email endpoint.

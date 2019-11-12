@@ -1,8 +1,17 @@
 const BASE_URL = '/api';
 
-const addNotification = (id) => {
-    const alert = document.querySelector(id);
-    alert.classList.remove("hide");
+const addNotification = (success) => {
+    if (success) {
+        let successalert = document.querySelector("#alert-success");
+        successalert.classList.remove("hide");
+        let erroralert = document.querySelector("#alert-error");
+        erroralert.classList.add("hide");
+    } else {
+        let successalert = document.querySelector("#alert-success");
+        successalert.classList.add("hide");
+        let erroralert = document.querySelector("#alert-error");
+        erroralert.classList.remove("hide");
+    }
 }
 
 const addSubscription = async sub => {
@@ -33,9 +42,9 @@ const formEvent = form.addEventListener('submit', async event => {
     const newSub = await addSubscription(sub);
     // if success
     if (newSub) {
-        addNotification("#alert-success");
+        addNotification(true);
     } else {
-        addNotification("#alert-error");
+        addNotification(false);
     }
     // reset state
     form.reset();
