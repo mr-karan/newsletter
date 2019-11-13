@@ -4,12 +4,14 @@
     "cssnano": "^4.1.10",
     "live-server": "^1.2.1",
     "lodash": "^4.17.13",
+    "postcss": "^7.0.21",
+    "postcss-cli": "^6.1.3",
     "prettier": "^1.19.0",
     "tailwind": "^4.0.0",
     "watch": "^1.0.2"
   },
   "scripts": {
-    "build:prod": "postcss css/*.css -o static/output.css && cp index.html static/index.html",
+    "build:prod": "./node_modules/.bin/postcss css/*.css -o static/output.css && cp index.html static/index.html",
     "build:dev": "tailwind build css/*.css -o static/output.css && cp index.html static/index.html",
     "watch": "watch 'yarn build:dev' ./css",
     "start:dev": "live-server . --port=3000"
