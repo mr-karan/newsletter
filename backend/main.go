@@ -1,53 +1,85 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
-	"github.com/asaskevich/govalidator"
+	"github.com/go-chi/chi"
+	"github.com/knadh/koanf"
+	"github.com/knadh/koanf/parsers/toml"
+	"github.com/knadh/koanf/providers/env"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/providers/posflag"
 	"github.com/knadh/stuffbin"
+
+	flag "github.com/spf13/pflag"
 )
 
 var (
 	version = "1.0.1"
-	sysLog  *log.Logger
-	errLog  *log.Logger
+	ko      = koanf.New(".")
 )
 
-// Response represents the standardized API response struct.
-type Response struct {
-	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data"`
+// App contains all the global components which
+// are injected into HTTP request handlers.
+type App struct {
+	fs     stuffbin.FileSystem
+	logger *log.Logger
 }
 
-// Subscription represents the parameters for unmarshalling
-// create subscription endpoint
-type Subscription struct {
-	EmailID string `json:"email"`
+func wrap(app *App, next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "app", app)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
-// sendEnvelope is used to send success response based on format defined in Response
-func sendEnvelope(w http.ResponseWriter, code int, message string, data interface{}) {
-	// Standard marshalled envelope for success.
-	a := Response{
-		Data:    data,
-		Message: message,
+func initLogger() *log.Logger {
+	return log.New(os.Stdout, "newsletter: ", log.Ldate|log.Ltime|log.Llongfile)
+}
+
+func initConfig() {
+	// Register --help handler.
+	f := flag.NewFlagSet("config", flag.ContinueOnError)
+	f.Usage = func() {
+		fmt.Println(f.FlagUsages())
+		os.Exit(0)
+	}
+	f.StringSlice("config", []string{"config.toml"},
+		"Path to one or more TOML config files to load in order")
+	f.StringSlice("prov", []string{"smtp.prov"},
+		"Path to a provider plugin. Can specify multiple values.")
+	f.Bool("version", false, "Show build version")
+	f.Parse(os.Args[1:])
+
+	// Display version.
+	if ok, _ := f.GetBool("version"); ok {
+		fmt.Println(version)
+		os.Exit(0)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	err := json.NewEncoder(w).Encode(a)
-	if err != nil {
-		errLog.Panicf("Quitting %s", err)
+	// Read the config files.
+	cFiles, _ := f.GetStringSlice("config")
+	for _, f := range cFiles {
+		log.Printf("reading config: %s", f)
+		if err := ko.Load(file.Provider(f), toml.Parser()); err != nil {
+			log.Printf("error reading config: %v", err)
+		}
 	}
-}
+	// Load environment variables and merge into the loaded config.
+	if err := ko.Load(env.Provider("NEWSLETTER_", ".", func(s string) string {
+		return strings.Replace(strings.ToLower(
+			strings.TrimPrefix(s, "NEWSLETTER_")), "__", ".", -1)
+	}), nil); err != nil {
+		log.Printf("error loading env config: %v", err)
+	}
 
-func initLogger() {
-	sysLog = log.New(os.Stdout, "SYS: ", log.Ldate|log.Ltime|log.Llongfile)
-	errLog = log.New(os.Stderr, "ERR: ", log.Ldate|log.Ltime|log.Llongfile)
+	ko.Load(posflag.Provider(f, ".", ko), nil)
 }
 
 // initFileSystem initializes the stuffbin FileSystem to provide
@@ -62,71 +94,43 @@ func initFileSystem(binPath string) (stuffbin.FileSystem, error) {
 }
 
 func main() {
-	initLogger()
+	app := &App{}
+	initConfig()
+	app.logger = initLogger()
+	app.logger.Printf("Booting program...")
+
 	// Initialize the static file system into which all
 	// required static assets (.css, .js files etc.) are loaded.
 	fs, err := initFileSystem(os.Args[0])
 	if err != nil {
-		errLog.Fatalf("error reading stuffed binary: %v", err)
+		app.logger.Fatalf("error reading stuffed binary: %v", err)
 	}
-	sysLog.Printf("Booting program...")
-	// Root Endpoint
-	http.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
-		sendEnvelope(w, http.StatusOK, fmt.Sprintf("Welcome to newsletter subscription API"), nil)
-		return
+	app.fs = fs
+
+	// Register handles.
+	r := chi.NewRouter()
+
+	r.Get("/api/", wrap(app, handleAPIRoot))
+	r.Get("/api/health", wrap(app, handleHealthCheck))
+	r.Post("/api/create", wrap(app, handleNewSubscription))
+	// TODO: Confirm email endpoint.
+
+	r.Get("/", wrap(app, handleIndex))
+	r.Get("/static/*", func(w http.ResponseWriter, r *http.Request) {
+		app.fs.FileServer().ServeHTTP(w, r)
 	})
-	// Healthcheck endpoint.
-	http.HandleFunc("/api/ping", func(w http.ResponseWriter, r *http.Request) {
-		sendEnvelope(w, http.StatusOK, fmt.Sprintf("PONG"), nil)
-		return
-	})
-	// Create subscription endpoint.
-	http.HandleFunc("/api/create", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			sendEnvelope(w, http.StatusMethodNotAllowed, fmt.Sprintf("%s request is not allowed", r.Method), nil)
-			return
-		}
-		// decode request payload in a struct
-		var sub Subscription
-		if err := json.NewDecoder(r.Body).Decode(&sub); err != nil {
-			errLog.Printf("Error while parsing body %s", err)
-			sendEnvelope(w, http.StatusInternalServerError, fmt.Sprintf("Unable to parse the request"), nil)
-			return
-		}
-		if len(sub.EmailID) > 254 || !govalidator.IsEmail(sub.EmailID) {
-			sendEnvelope(w, http.StatusBadRequest, fmt.Sprintf("EMail ID: %s is not valid", sub.EmailID), nil)
-			return
-		}
-		sendEnvelope(w, http.StatusOK, fmt.Sprintf(sub.EmailID), nil)
-		return
-	})
-	// Confirm email endpoint.
-	http.HandleFunc("/api/confirmation", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
-			sendEnvelope(w, http.StatusMethodNotAllowed, fmt.Sprintf("%s request is not allowed", r.Method), nil)
-			return
-		}
-		// decode request payload in a struct
-		sendEnvelope(w, http.StatusOK, "wip", nil)
-		return
-	})
-	// Static handler
-	http.Handle("/static/", fs.FileServer())
-	// Load index page
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		index, err := fs.Read("/static/index.html")
-		if err != nil {
-			sendEnvelope(w, http.StatusInternalServerError, fmt.Sprintf("error loading index from stuffed binary"), nil)
-			return
-		}
-		w.Header().Set("Content-Type", "text/html")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(string(index)))
-		return
-	})
+
 	// Start a web server
-	sysLog.Printf("Listening on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		errLog.Fatalf("Error starting server: %s", err)
+	srv := &http.Server{
+		Addr:         ko.String("server.address"),
+		ReadTimeout:  ko.Duration("server.read_timeout") * time.Second,
+		WriteTimeout: ko.Duration("server.write_timeout") * time.Second,
+		IdleTimeout:  ko.Duration("server.keepalive_timeout") * time.Second,
+		Handler:      r,
+	}
+
+	app.logger.Printf("starting on %s", srv.Addr)
+	if err := srv.ListenAndServe(); err != nil {
+		app.logger.Fatalf("couldn't start server: %v", err)
 	}
 }
