@@ -14,6 +14,11 @@ type Response struct {
 	Data    interface{} `json:"data"`
 }
 
+const (
+	redisNamespace      = "newsletter"
+	confirmKeyNamespace = redisNamespace + ":confirm"
+)
+
 // Subscription represents the parameters for unmarshalling
 // create subscription endpoint
 type Subscription struct {
@@ -65,10 +70,6 @@ func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
 // New subscription endpoint
 func handleNewSubscription(w http.ResponseWriter, r *http.Request) {
 	var app = r.Context().Value("app").(*App)
-	if r.Method != "POST" {
-		sendResponse(w, http.StatusMethodNotAllowed, fmt.Sprintf("%s request is not allowed", r.Method), nil)
-		return
-	}
 	// decode request payload in a struct
 	var sub Subscription
 	if err := json.NewDecoder(r.Body).Decode(&sub); err != nil {
@@ -81,6 +82,25 @@ func handleNewSubscription(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// TODO: Integrate Mailgun and send a confirmation email
+	token, err := generateToken(32)
+	if err != nil {
+		sendResponse(w, http.StatusInternalServerError, fmt.Sprintf("Unable to generate token"), nil)
+		return
+	}
+	// store token in cache
+	conn := app.cachePool.Get()
+	defer conn.Close()
+	_, err = conn.Do("SET", fmt.Sprintf("%s:%s", confirmKeyNamespace, token), fmt.Sprintf(sub.EmailID))
+	if err != nil {
+		sendResponse(w, http.StatusInternalServerError, fmt.Sprintf("Unable to store token in cache"), nil)
+		return
+	}
 	sendResponse(w, http.StatusOK, fmt.Sprintf(sub.EmailID), nil)
 	return
+}
+
+// Confirm email endpoint
+
+func handleConfirmEmail(w http.ResponseWriter, r *http.Request) {
+	// var app = r.Context().Value("app").(*App)
 }

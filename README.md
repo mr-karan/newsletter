@@ -22,5 +22,7 @@ $ yarn build:prod # uses with `PostCSS` plugins like `css-nano` and `purge-css` 
 
 ```sh
 $ cd backend
+$ docker run -p 9379:6379 redis:latest # to run redis
+$ cp config.toml.sample config.toml # and replace with your config
 $ make fresh # starts a webserver with static assets packed into binary. API is available at `/api` and static assets at `/static`.
 ```

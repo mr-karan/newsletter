@@ -1,0 +1,15 @@
+# All timeouts and durations are in milliseconds.
+[server]
+address = ":6000"
+name = "newsletter"
+
+# WARNING If these timeouts are less than 1s,
+# the server connection breaks.
+read_timeout=5000
+write_timeout=5000
+keepalive_timeout=600000
+
+[app]
+
+[app.redis]
+address =  "127.0.0.1:6739"

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/gomodule/redigo/redis"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/env"
@@ -28,8 +29,9 @@ var (
 // App contains all the global components which
 // are injected into HTTP request handlers.
 type App struct {
-	fs     stuffbin.FileSystem
-	logger *log.Logger
+	fs        stuffbin.FileSystem
+	logger    *log.Logger
+	cachePool *redis.Pool
 }
 
 func wrap(app *App, next http.HandlerFunc) http.HandlerFunc {
@@ -93,6 +95,21 @@ func initFileSystem(binPath string) (stuffbin.FileSystem, error) {
 	return fs, nil
 }
 
+// initCachePool initializes redis for cache
+func initCachePool(addr string) *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 300 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial("tcp", addr)
+			if err != nil {
+				return nil, err
+			}
+			return c, nil
+		},
+	}
+}
+
 func main() {
 	app := &App{}
 	initConfig()
@@ -106,14 +123,22 @@ func main() {
 		app.logger.Fatalf("error reading stuffed binary: %v", err)
 	}
 	app.fs = fs
-
+	cachePool := initCachePool(ko.String("app.redis.address"))
+	// check if redis is alive or not
+	conn := cachePool.Get()
+	defer conn.Close()
+	_, err = conn.Do("PING")
+	if err != nil {
+		app.logger.Fatalf("error initializing cache pool: %v", err)
+	}
+	app.cachePool = cachePool
 	// Register handles.
 	r := chi.NewRouter()
 
 	r.Get("/api/", wrap(app, handleAPIRoot))
 	r.Get("/api/health", wrap(app, handleHealthCheck))
 	r.Post("/api/create", wrap(app, handleNewSubscription))
-	// TODO: Confirm email endpoint.
+	r.Get("/api/confirm", wrap(app, handleConfirmEmail))
 
 	r.Get("/", wrap(app, handleIndex))
 	r.Get("/static/*", func(w http.ResponseWriter, r *http.Request) {
