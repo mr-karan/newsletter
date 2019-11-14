@@ -2,7 +2,7 @@
 
 - [ ] Add Mailgun API for confirmation email
 - [ ] Add `go-cache` or some other in-memory cache for storing confirmation tokens with expiry.
-- [ ] Switch to `chi` for routing
+- [x] Switch to `chi` for routing
 - [ ] Handler for /confirmation
 - [ ] Listmonk API integration
 - [ ] Media assets/icons in HTML
