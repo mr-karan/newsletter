@@ -90,8 +90,10 @@ func handleNewSubscription(w http.ResponseWriter, r *http.Request) {
 	// store token in cache
 	conn := app.cachePool.Get()
 	defer conn.Close()
-	_, err = conn.Do("SET", fmt.Sprintf("%s:%s", confirmKeyNamespace, token), fmt.Sprintf(sub.EmailID))
+	fmt.Println(app.keyTTL)
+	_, err = conn.Do("SET", fmt.Sprintf("%s:%s", confirmKeyNamespace, token), fmt.Sprintf(sub.EmailID), "EX", app.keyTTL)
 	if err != nil {
+		app.logger.Printf("Unable to store token in cache: %v", err)
 		sendResponse(w, http.StatusInternalServerError, fmt.Sprintf("Unable to store token in cache"), nil)
 		return
 	}

@@ -32,6 +32,7 @@ type App struct {
 	fs        stuffbin.FileSystem
 	logger    *log.Logger
 	cachePool *redis.Pool
+	keyTTL    int
 }
 
 func wrap(app *App, next http.HandlerFunc) http.HandlerFunc {
@@ -132,6 +133,7 @@ func main() {
 		app.logger.Fatalf("error initializing cache pool: %v", err)
 	}
 	app.cachePool = cachePool
+	app.keyTTL = ko.Int("app.redis.key_ttl")
 	// Register handles.
 	r := chi.NewRouter()
 
