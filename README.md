@@ -1,10 +1,11 @@
 # Newsletter
 
-This repo is WIP.
+**This repo is WIP.**
 
 > This repo contains the source code I use to self host my personal newsletter. The subscription form integrates with [listmonk](https://listmonk.app).
 
-Subscribe to my newsletter at [news.mrkaran.dev](news.mrkaran.dev)
+
+![img](screenshot.png)
 
 ## Setup
 
